@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { Chat, clearChatsByTagId, deleteChat, getChats, initChatsDb, insertChat, updateChat, updateChatsInsertedById } from '@/db/chats'
+import { Chat, clearChatsByTagId, deleteChat, deleteClipboardChat, getChats, initChatsDb, insertChat, updateChat, updateChatsInsertedById } from '@/db/chats'
 import { Store } from '@tauri-apps/plugin-store';
 import { locales } from '@/lib/locales';
 
@@ -26,6 +26,8 @@ interface ChatState {
 
   clearChats: (tagId: number) => Promise<void> // 清空 chats
   updateInsert: (id: number) => Promise<void> // 更新 inserted
+
+  deleteClipboardChat: () => Promise<void> // 删除 clipboard 类型的 chat
 }
 
 const useChatStore = create<ChatState>((set, get) => ({
@@ -87,6 +89,12 @@ const useChatStore = create<ChatState>((set, get) => ({
     const newChats = chats.filter(item => item.id !== id)
     set({ chats: newChats })
     await deleteChat(id)
+  },
+  deleteClipboardChat: async () => {
+    const chats = get().chats
+    const newChats = chats.filter(item => item.type !== 'clipboard')
+    set({ chats: newChats })
+    await deleteClipboardChat()
   },
 
 

@@ -1,6 +1,7 @@
 import { Store } from '@tauri-apps/plugin-store'
 import { create } from 'zustand'
 import { getVersion } from '@tauri-apps/api/app'
+import useChatStore from '@/stores/chat';
 
 export enum GenTemplateRange {
   All = '全部',
@@ -99,6 +100,10 @@ interface SettingState {
 
   workspacePath: string
   setWorkspacePath: (path: string) => Promise<void>
+
+  // 剪贴板监听相关设置
+  listenClipboard: boolean
+  setListenClipboard: (listenClipboard: boolean) => Promise<void>
 }
 
 
@@ -279,7 +284,19 @@ const useSettingStore = create<SettingState>((set, get) => ({
     set({ primaryBackupMethod: method })
     const store = await Store.load('store.json');
     await store.set('primaryBackupMethod', method)
-  }
+  },
+
+  // 剪贴板监听相关设置
+  listenClipboard: true,
+  setListenClipboard: async (listenClipboard: boolean) => {
+    set({ listenClipboard })
+    const store = await Store.load('store.json');
+    await store.set('listenClipboard', listenClipboard)
+    if (!listenClipboard) {
+      const { deleteClipboardChat } = useChatStore.getState()
+      await deleteClipboardChat()
+    }
+  },
 }))
 
 export default useSettingStore

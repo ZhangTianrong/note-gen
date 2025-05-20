@@ -79,3 +79,11 @@ export async function deleteChat(id: number) {
     delete from chats where id = ${id}
   `)
 }
+
+// 删除 clipboard 类型的 chat
+export async function deleteClipboardChat() {
+  const db = await getDb()
+  return await db.execute(`
+    delete from chats where type = 'clipboard'
+  `)
+}

@@ -8,11 +8,14 @@ import { getCurrentWindow } from '@tauri-apps/api/window';
 import { Store } from "@tauri-apps/plugin-store";
 import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
+import useSettingStore from "@/stores/setting";
+import { Switch } from "@/components/ui/switch";
 
 export function SettingDev({id, icon}: {id: string, icon?: React.ReactNode}) {
   const t = useTranslations();
   const [proxy, setProxy] = useState('');
   const { toast } = useToast()
+  const { listenClipboard, setListenClipboard } = useSettingStore()
 
   async function handleClearData() {
     const res = await confirm(t('settings.dev.clearDataConfirm'), {
@@ -80,6 +83,14 @@ export function SettingDev({id, icon}: {id: string, icon?: React.ReactNode}) {
       <SettingRow border>
         <span>清理文件，包括图片、文章。</span>
         <Button variant={"destructive"} onClick={handleClearFile}>清理</Button>
+      </SettingRow>
+      <SettingRow border>
+        <span>开启或关闭剪贴板监听。</span>
+        <Switch 
+          checked={listenClipboard} 
+          onCheckedChange={(checked) => setListenClipboard(checked)} 
+          disabled={false}
+        />
       </SettingRow>
     </SettingType>
   )

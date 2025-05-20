@@ -6,13 +6,16 @@ import { listen, UnlistenFn } from "@tauri-apps/api/event";
 import { v4 as uuid } from "uuid";
 import useChatStore from "@/stores/chat";
 import useTagStore from "@/stores/tag";
+import useSettingStore from "@/stores/setting";
 
 export function ClipboardListener() {
   const { insert, chats, loading } = useChatStore()
   const { currentTagId } = useTagStore()
+  const { listenClipboard } = useSettingStore()
   let unlisten: UnlistenFn;
 
   async function readHandler() {
+    if (!listenClipboard) return
     if (loading) return
     const hasImageRes = await hasImage()
     const hasTextRes = await hasText()
